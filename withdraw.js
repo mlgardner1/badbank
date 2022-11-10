@@ -1,32 +1,51 @@
+
 function Withdraw(){
   const [show, setShow]         = React.useState(true);
+  const [balance, setBalance]   = React.useState('100');
+  const [withdraw, setWithdraw]   = React.useState('');
+  const [disabled, setDisabled] = React.useState(true);
   const [status, setStatus]     = React.useState('');
-  const [name, setName]         = React.useState('');
-  const [balance, setBalance]   = React.useState('');
   const ctx = React.useContext(UserContext);  
 
-  let currentBalance =  `Balance: $ ${name.balance}`;
-
-  function validate(field){
-      if (!field) {
-        setStatus('Error: incomplete deposit amount');
+  const validate = amount => {
+      if (!amount) {
+        setStatus('Error: Enter withdrawal amount');
         setTimeout(() => setStatus(''),3000);
+        return false;
+      }
+      if (balance - amount < 0) {
+        setStatus('Error: Cannot withdraw more than is in the account')
+        return false;
+      }
+      if (amount != Number) {
+        setStatus('Error: Please enter a valid number');
         return false;
       }
       return true;
   }
 
-  function handleCreate(){
-    console.log(name);
-    if (!validate(name,     'name'))     return;
-    ctx.users.push({name,email,password,balance:100});
-    setShow(false);
-  }    
+  const withdrawMoney = amount => {
+    if(!validate(amount)) return;
+    setBalance(Number(balance) - Number(amount));
+    setShow(false)
+    setStatus('');
+    ctx.users.push(Number(balance) - Number(amount));
+  }
+
 
   function clearForm(){
-    setName('');
+    setWithdraw('');
     setShow(true);
   }
+
+  React.useEffect(() => {
+    if (!withdraw) {
+      setDisabled(true);
+    }
+    else {
+      setDisabled(false);
+    }
+  }, [withdraw]);
 
   return (
     <Card
@@ -36,35 +55,18 @@ function Withdraw(){
       body={show ? (  
               <>
             <div>
-           <h5>Balance: ${ctx.users.balance}</h5>
+           <h5>Balance: ${balance}</h5>
             </div>
-              Deposit Amount<br/>
-              <input type="input" className="form-control" id="withdraw" placeholder="Withdrawl amount" value={name} onChange={e => setName(e.currentTarget.value)} /><br/>
-              <button type="submit" className="btn btn-light" onClick={handleCreate}>Withdraw</button>
+              Withdrawal amount<br/>
+              <input type="withdraw" className="form-control" id="withdraw" placeholder="$0.00" value={withdraw} onChange={e => setWithdraw(e.currentTarget.value)} /><br/>
+              <button type="submit" className="btn btn-light" onClick={()=> withdrawMoney(withdraw)} disabled={disabled}>Withdraw</button>
               </>
             ):(
               <>
               <h5>Success</h5>
-              <button type="submit" className="btn btn-light" onClick={clearForm}>Make another withdrawl</button>
+              <button type="submit" className="btn btn-light" onClick={clearForm}>Make another withdrawal</button>
               </>
             )}
     />
   )
 }
-// function CreateAccount(){
-  //const ctx = React.useContext(UserContext);
-  //
-  //function handle(data){
-    //ctx.users.push({name:data.name,email:data.email,password:data.password,balance:100});
-    //return true;
-  //}
-  //return(
-    //<BankForm
-      //bgcolor="primary"
-      //label="Create Account"
-      //handle={handle}
-      //hideAmount={true}
-      //successButton="Add another account"
-      // />
-  //)
-//}

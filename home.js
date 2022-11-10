@@ -3,9 +3,9 @@ function Home(){
     <Card
       bgcolor="success"
       txtcolor="black"
-      header="BadBank Landing Module"
+      header="BadBank Home Page"
       title="Welcome to BadBank"
-      text="You can move around using the navigation bar."
+      text="For all your banking needs."
       body={(<img src="bank.png" className="img-fluid" alt="Responsive image"/>)}
     />    
   );  
